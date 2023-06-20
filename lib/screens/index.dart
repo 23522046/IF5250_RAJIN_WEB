@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:if5250_rajin_apps_web/screens/tab/status.dart';
+import 'package:if5250_rajin_apps_web/utils/session.dart';
 
 import '../model/staff.dart';
-import '../utils/session.dart';
 import 'login.dart';
 import 'tab/absensi.dart';
 
 class IndexPage extends StatefulWidget {
-  Staff sessionStaff;
-
-  IndexPage({required this.sessionStaff});
+  IndexPage();
 
   @override
   _IndexPageState createState() => _IndexPageState();
@@ -17,8 +15,7 @@ class IndexPage extends StatefulWidget {
 
 class _IndexPageState extends State<IndexPage> {
   Widget? _selectedTab;
-  String _title = 'Laporan Kehadiran';
-  String name = 'Memuat...', role = 'Memuat...';
+  String _title = 'Laporan Kehadiran', _nama = 'Loading...';
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   void _selectTab(Widget tab, String title) {
@@ -36,17 +33,6 @@ class _IndexPageState extends State<IndexPage> {
     super.initState();
   }
 
-  void _loadSession() async {
-    Staff s = await loadSession();
-    print(s.jenisAkunWeb);
-    setState(() {
-      name = s.nama ?? '';
-      role = (s.isAdminSistem)
-          ? '${s.noInduk} - ${s.jenisAkunWeb}'
-          : '${s.noInduk} - Administrator Sistem';
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,9 +42,9 @@ class _IndexPageState extends State<IndexPage> {
       drawer: Drawer(
           child: ListView(padding: EdgeInsets.zero, children: [
         UserAccountsDrawerHeader(
-          accountName: new Text(name),
-          accountEmail: new Text(role),
-          decoration: new BoxDecoration(
+          accountName: Text(_nama),
+          accountEmail: const Text('Administrator Sistem'),
+          decoration: const BoxDecoration(
             image: DecorationImage(
                 image: AssetImage('assets/images/south_america.jpg'),
                 fit: BoxFit.cover),
@@ -67,9 +53,9 @@ class _IndexPageState extends State<IndexPage> {
           currentAccountPicture: Container(
               width: 190.0,
               height: 190.0,
-              decoration: new BoxDecoration(
+              decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  image: new DecorationImage(
+                  image: DecorationImage(
                       fit: BoxFit.fill,
                       image: AssetImage("assets/images/dummy-ava.png")))),
         ),
@@ -110,42 +96,30 @@ class _IndexPageState extends State<IndexPage> {
         //       onTap: () => _selectTab(
         //           AbsensiTab(scaffoldKey: _scaffoldKey), 'Laporan Tahunan')),
         ListTile(
-            leading: Icon(Icons.assignment),
-            title: Text('Permohonan Sakit dan Cuti'),
+            leading: const Icon(Icons.assignment),
+            title: const Text('Approval Cuti dan Sakit'),
             onTap: () => _selectTab(StatusTab(scaffoldKey: _scaffoldKey),
                 'Permohonan Sakit dan Cuti')),
-        // if (widget.sessionStaff.isAdminSistem ||
-        //     widget.sessionStaff.isAdminUnit)
-        //   ListTile(
+        // ListTile(
         //       leading: Icon(Icons.person_pin),
         //       title: Text('Pegawai & Dosen'),
         //       onTap: () =>
         //           _selectTab(StaffTab(scaffoldKey: _scaffoldKey), 'Pegawai')),
-        // if (widget.sessionStaff.isAdminSistem)
-        // ListTile(
-        //     leading: Icon(Icons.auto_fix_normal),
-        //     title: Text('Data Cleansing'),
-        //     onTap: () => Navigator.of(context).push(
-        //         MaterialPageRoute(builder: (context) => DataCleansingPage()))),
-        // if (widget.sessionStaff.isAdminSistem)
-        //   ListTile(
-        //       leading: Icon(Icons.work, color: Colors.grey),
-        //       title: Text('Unit Kerja', style: TextStyle(color: Colors.grey)),
-        //       onTap: () {}),
-        // if (widget.sessionStaff.isAdminSistem)
-        //   ListTile(
-        //       leading: Icon(Icons.group_work, color: Colors.grey),
-        //       title: Text('Jabatan', style: TextStyle(color: Colors.grey)),
-        //       onTap: () {}),
         ListTile(
-            leading: Icon(Icons.exit_to_app),
-            title: Text('Keluar'),
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Keluar'),
             onTap: () async {
-              await clearSession();
               Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (BuildContext context) => LoginPage()));
             })
       ])),
     );
+  }
+
+  void _loadSession() async {
+    Staff s = await loadSession();
+    setState(() {
+      _nama = s.nama!;
+    });
   }
 }

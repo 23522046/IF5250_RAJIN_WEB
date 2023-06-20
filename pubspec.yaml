@@ -35,10 +35,11 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  cloud_firestore: ^4.5.0
+  firebase_core: ^2.14.0
+  cloud_firestore: ^4.8.1
+  firebase_auth: ^4.6.3
   carousel_slider: ^2.2.1
   dynamic_themes: ^1.1.0
-  firebase_core: ^2.9.0
   google_sign_in: ^6.1.0
   crypto: ^3.0.1
   printing: ^5.0.4

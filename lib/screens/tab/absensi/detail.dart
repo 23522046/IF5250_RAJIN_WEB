@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 
 import '../../../model/presensi.dart';
 import '../../../model/staff.dart';
-import '../../../utils/session.dart';
 
 class DetailPage extends StatefulWidget {
   final Presensi presensi;
@@ -114,7 +113,6 @@ class _DetailPageState extends State<DetailPage> {
 
   void updateRecord() async {
     try {
-      Staff s = await loadSession();
       // jika tanggal jam masuk dan jam berubah tidak sama
       if (!widget.presensi.checkIn.waktu
           .toDate()

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/staff.dart';
@@ -5,24 +8,17 @@ import '../model/staff.dart';
 const String IS_LOGIN = "is_login";
 const String NO_INDUK = "no_induk";
 const String NAMA = "nama";
-const String UNIT_KERJA = "unit_kerja";
-const String EMAIL = "email";
-const String HP = "hp";
-const String JABATAN_STRUKTURAL = "jabatan_struktural";
-const String ROLE = 'role';
+const String UNIT_KERJA_ID = "unit_kerja";
+const String UNIT_KERJA_PARENT_ID = "unit_kerja_parent";
 
-Future createSession(Map<String, dynamic> staff) async {
+Future<bool> createSession(Map<String, dynamic> staff) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setBool(IS_LOGIN, true);
   prefs.setString(NO_INDUK, staff['no_induk']);
   prefs.setString(NAMA, staff['nama']);
-  if (staff.containsKey('unit_kerja'))
-    prefs.setString(UNIT_KERJA, staff['unit_kerja']);
-  if (staff.containsKey('email')) prefs.setString(EMAIL, staff['email']);
-  if (staff.containsKey('hp')) prefs.setString(HP, staff['hp']);
-  if (staff.containsKey('jabatan_struktural'))
-    prefs.setString(JABATAN_STRUKTURAL, staff['jabatan_struktural']);
-  prefs.setString(ROLE, staff['jenis_akun_web']);
+  prefs.setString(UNIT_KERJA_ID, (staff['unit_kerja'] as DocumentReference).id);
+  prefs.setString(UNIT_KERJA_PARENT_ID,
+      (staff['unit_kerja_parent'] as DocumentReference).id);
   return true;
 }
 
@@ -31,10 +27,12 @@ Future<Staff> loadSession() async {
   Staff s = Staff(
       noInduk: prefs.getString(NO_INDUK),
       nama: prefs.getString(NAMA),
-      unitKerja: prefs.getString(UNIT_KERJA),
-      email: prefs.getString(EMAIL),
-      hp: prefs.getString(HP),
-      jenisAkunWeb: prefs.getString(ROLE));
+      unitKerja: FirebaseFirestore.instance
+          .collection('unit_kerja')
+          .doc(prefs.getString(UNIT_KERJA_ID)!),
+      unitKerjaParent: FirebaseFirestore.instance
+          .collection('unit_kerja')
+          .doc(prefs.getString(UNIT_KERJA_PARENT_ID)!));
   return s;
 }
 

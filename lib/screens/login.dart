@@ -2,10 +2,12 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:if5250_rajin_apps_web/model/unit_kerja.dart';
+import 'package:if5250_rajin_apps_web/utils/session.dart';
 
 import '../model/staff.dart';
-import '../utils/session.dart';
 import 'index.dart';
 
 class LoginPage extends StatefulWidget {
@@ -15,8 +17,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController nipCont = new TextEditingController();
-  TextEditingController passCont = new TextEditingController();
+  TextEditingController nipCont = TextEditingController();
+  TextEditingController passCont = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -27,18 +29,15 @@ class _LoginPageState extends State<LoginPage> {
           builder: (context) => Center(
             child: SingleChildScrollView(
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 500),
+                constraints: const BoxConstraints(maxWidth: 500),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Visibility(
-                      visible: true,
-                      child: CircleAvatar(
-                        radius: 100,
-                        backgroundImage: AssetImage('assets/images/logo.png'),
-                      ),
+                    const CircleAvatar(
+                      radius: 100,
+                      backgroundImage: AssetImage('assets/images/logo.png'),
                     ),
-                    Text(
+                    const Text(
                       'RAJIN APPS ADMINISTRATOR',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -66,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       color: Colors.white,
-                      margin: EdgeInsets.symmetric(
+                      margin: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 25.0),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -104,20 +103,12 @@ class _LoginPageState extends State<LoginPage> {
                                   return null;
                                 },
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 16.0,
                               ),
                               SizedBox(
                                 width: double.infinity,
-                                child: new MaterialButton(
-                                  child: Text(
-                                    "LOGIN",
-                                    style: TextStyle(
-                                      fontFamily: 'SourceSansPro',
-                                      color: Colors.white,
-                                      fontSize: 16.0,
-                                    ),
-                                  ),
+                                child: MaterialButton(
                                   onPressed: () async {
                                     submit();
                                   },
@@ -125,6 +116,14 @@ class _LoginPageState extends State<LoginPage> {
                                   minWidth: double.infinity,
                                   height: 48.0,
                                   color: Colors.pinkAccent,
+                                  child: const Text(
+                                    "LOGIN",
+                                    style: TextStyle(
+                                      fontFamily: 'SourceSansPro',
+                                      color: Colors.white,
+                                      fontSize: 16.0,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -145,13 +144,18 @@ class _LoginPageState extends State<LoginPage> {
   void submit() async {
     if (_formKey.currentState!.validate()) {
       try {
-// process data
-        String passHash = sha1.convert(utf8.encode(passCont.text)).toString();
-        // DocumentReference staffRef =
-        //     FirebaseFirestore.instance.collection('staff').doc(nipCont.text);
-        DocumentReference staffRef = FirebaseFirestore.instance
-            .collection('staff')
-            .doc('89WaRxxcffWzQFPGwnBRjJJ2QdG2');
+        final credential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(
+                email: nipCont.text, password: passCont.text);
+
+        if (credential.user == null) {
+          throw ("User is found");
+        }
+
+        User user = credential.user!;
+
+        DocumentReference staffRef =
+            FirebaseFirestore.instance.collection('staff').doc(user.uid);
 
         DocumentSnapshot staff = await staffRef.get();
 
@@ -159,16 +163,24 @@ class _LoginPageState extends State<LoginPage> {
           throw ('NIP/NIK tidak ditemukan, silahkan cek kembali');
         }
 
-        print(staff.data());
+        // print(staff.data());
+
+        Map<String, dynamic> staffMap = staff.data() as Map<String, dynamic>;
+
+        DocumentSnapshot unitKerjaSnap =
+            await (staffMap['unit_kerja'] as DocumentReference).get();
+        UnitKerja unitKerja =
+            UnitKerja.fromJson(unitKerjaSnap.data() as Map<String, dynamic>);
+
+        staffMap['unit_kerja_parent'] = unitKerja.parent;
+
+        createSession(staffMap);
 
         Staff _staff = Staff.fromJson(staff.data() as Map<String, dynamic>);
+        // print(_staff.unitKerja.toString());
 
-        createSession(staff.data() as Map<String, dynamic>);
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) => IndexPage(
-                  sessionStaff:
-                      Staff.fromJson(staff.data() as Map<String, dynamic>),
-                )));
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => IndexPage()));
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             duration: const Duration(seconds: 3), content: Text(e.toString())));
