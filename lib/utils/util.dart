@@ -302,7 +302,7 @@ List<DateTime> getDaysInBeteween(DateTime? startDate, DateTime? endDate,
 
 extension DateTimeExt on DateTime {
   bool isWorkingDay() {
-    bool isSeninSdJumat = this.weekday <= SysConfig.listJamKerja(null).length;
+    bool isSeninSdJumat = (weekday >= 1 && weekday <= 5);
     bool isTanggalMerah = false;
     SysConfig.listTanggalMerah().forEach((tgl) {
       if (this.isSameDate(tgl)) isTanggalMerah = true;

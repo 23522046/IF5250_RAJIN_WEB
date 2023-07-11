@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:if5250_rajin_apps_web/model/unit_kerja.dart';
 
 import 'sys_config.dart';
 
@@ -9,6 +10,8 @@ class Staff {
   bool? isAktif, isAdminWeb;
   DocumentReference? unitKerja;
   DocumentReference? unitKerjaParent;
+  UnitKerja? unitKerjaParentCol;
+  String? unitKerjaParentName;
 
   int?
       jumlahHadir; // digunakan pada laporan uang makan, diisi dengan jumlah hadir per bulan
@@ -23,7 +26,9 @@ class Staff {
       this.jumlahHadir,
       this.playerId,
       this.UID,
-      this.unitKerjaParent});
+      this.unitKerjaParent,
+      this.unitKerjaParentName,
+      this.unitKerjaParentCol});
 
   factory Staff.fromJson(Map<String, dynamic> json) {
     return Staff(

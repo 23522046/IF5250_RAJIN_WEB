@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
     DocumentSnapshot staff = await staffRef.get();
 
     if (!staff.exists) {
-      throw ('NIP/NIK tidak ditemukan, silahkan cek kembali');
+      throw ('Data user tidak ditemukan, silahkan cek kembali');
     }
 
     Staff _staff = Staff.fromJson(staff.data() as Map<String, dynamic>);
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     if (FirebaseAuth.instance.currentUser != null) {}
     return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.green),
+      theme: ThemeData(primarySwatch: Colors.purple),
       home:
           //  LoginPage()
           FutureBuilder<Staff?>(
@@ -60,15 +60,17 @@ class MyApp extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                        height: 200,
-                        child: Image.asset('assets/images/logo.png')),
-                    Text('PRESENSIA',
+                    CircleAvatar(
+                      radius: 120,
+                      backgroundImage: AssetImage('assets/images/logo.png'),
+                    ),
+                    const Text('Loading...',
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 25)),
-                    SizedBox(height: 20),
-                    CircularProgressIndicator()
+                    const SizedBox(height: 20),
+                    const CircularProgressIndicator()
                   ],
                 ),
               ),

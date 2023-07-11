@@ -9,12 +9,12 @@ import '../../../model/pengajuan.dart';
 import '../../../model/presensi.dart';
 import '../../../utils/util.dart';
 
-class StatusTable extends StatefulWidget {
+class ApprovalTable extends StatefulWidget {
   final DateTime startDate, endDate;
   final RadioDay selectedRadioDay;
   List<Pengajuan> pengajuans;
 
-  StatusTable(
+  ApprovalTable(
       {required this.pengajuans,
       required this.startDate,
       required this.endDate,
@@ -23,10 +23,10 @@ class StatusTable extends StatefulWidget {
       : super(key: key);
 
   @override
-  StatusTableState createState() => StatusTableState();
+  ApprovalTableState createState() => ApprovalTableState();
 }
 
-class StatusTableState extends State<StatusTable> {
+class ApprovalTableState extends State<ApprovalTable> {
   List<DateTime>? listDateTime;
 
   @override
@@ -44,7 +44,7 @@ class StatusTableState extends State<StatusTable> {
             child: DataTable(
               columns: <DataColumn>[
                 _renderCol('#'),
-                _renderCol('NIP/NIK'),
+                _renderCol('NOMOR INDUK'),
                 _renderCol('NAMA'),
                 _renderCol('JENIS'),
                 _renderCol('MULAI TANGGAL'),
@@ -193,7 +193,7 @@ class StatusTableState extends State<StatusTable> {
         context: context,
         builder: (context) {
           List<Widget> children = [
-            Text('NIP/NIK : ', style: TextStyle(fontSize: 12)),
+            Text('Nomor Induk : ', style: TextStyle(fontSize: 12)),
             Text('${pengajuan.staff?.noInduk}',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 5),

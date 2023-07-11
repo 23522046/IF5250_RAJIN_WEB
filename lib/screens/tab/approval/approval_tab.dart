@@ -1,21 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../../model/pengajuan.dart';
-import '../../model/staff.dart';
-import '../../utils/util.dart';
-import '../../widgets/featured_heading.dart';
-import 'status/status_table.dart';
+import '../../../model/pengajuan.dart';
+import '../../../model/staff.dart';
+import '../../../utils/util.dart';
+import '../../../widgets/featured_heading.dart';
+import 'approval_table.dart';
 
-class StatusTab extends StatefulWidget {
+class ApprovalTab extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
 
-  StatusTab({required this.scaffoldKey});
+  ApprovalTab({required this.scaffoldKey});
   @override
   _AbsensiTabState createState() => _AbsensiTabState();
 }
 
-class _AbsensiTabState extends State<StatusTab> {
+class _AbsensiTabState extends State<ApprovalTab> {
   final _formKey = GlobalKey<FormState>();
 
   String? selectedUnitKerja;
@@ -250,7 +250,7 @@ class _AbsensiTabState extends State<StatusTab> {
                               controller: noIndukCont,
                               decoration: const InputDecoration(
                                 icon: Icon(Icons.format_list_numbered),
-                                labelText: 'Cari berdasarkan NIP/NIK',
+                                labelText: 'Cari berdasarkan Nomor Induk',
                               ),
                               validator: (value) {
                                 if (value != null) {
@@ -417,7 +417,7 @@ class _AbsensiTabState extends State<StatusTab> {
           ),
         ),
         if (startDate != null && endDate != null)
-          StatusTable(
+          ApprovalTable(
               pengajuans: pengajuans,
               startDate: startDate!,
               endDate: endDate!,

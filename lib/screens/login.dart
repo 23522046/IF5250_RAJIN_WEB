@@ -160,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
         DocumentSnapshot staff = await staffRef.get();
 
         if (!staff.exists) {
-          throw ('NIP/NIK tidak ditemukan, silahkan cek kembali');
+          throw ('Data tidak ditemukan, silahkan cek kembali');
         }
 
         // print(staff.data());
@@ -169,10 +169,18 @@ class _LoginPageState extends State<LoginPage> {
 
         DocumentSnapshot unitKerjaSnap =
             await (staffMap['unit_kerja'] as DocumentReference).get();
-        UnitKerja unitKerja =
-            UnitKerja.fromJson(unitKerjaSnap.data() as Map<String, dynamic>);
+
+        UnitKerja unitKerja = UnitKerja.fromJson(
+            unitKerjaSnap.data() as Map<String, dynamic>, unitKerjaSnap.id);
+
+        DocumentSnapshot unitKerjaParentSnap = await unitKerja.parent!.get();
+
+        UnitKerja unitKerjaParent = UnitKerja.fromJson(
+            unitKerjaParentSnap.data() as Map<String, dynamic>,
+            unitKerjaParentSnap.id);
 
         staffMap['unit_kerja_parent'] = unitKerja.parent;
+        staffMap['unit_kerja_parent_name'] = unitKerjaParent.nama;
 
         createSession(staffMap);
 

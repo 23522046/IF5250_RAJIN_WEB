@@ -66,6 +66,8 @@ class Presensi {
   }
 
   String terlambat(MasterJamKerja masterJamKerja) {
+    if (!isTerlambat(masterJamKerja)) return '';
+
     Duration? selisihTelatMasuk = this.selisihTelatMasuk(masterJamKerja);
     if (jenis == 'wfh' || jenis == 'wfo') {
       return (selisihTelatMasuk == null)
@@ -77,6 +79,8 @@ class Presensi {
   }
 
   String cepatPulang(MasterJamKerja masterJamKerja) {
+    if (!isCepatPulang(masterJamKerja)) return '';
+
     Duration? selisihCepatPulang = this.selisihCepatPulang(masterJamKerja);
     // print('selisihCepatPulang : ${selisihCepatPulang.inHours}');
     if (jenis == 'wfh' || jenis == 'wfo') {
@@ -89,6 +93,7 @@ class Presensi {
   }
 
   String durasiKerja(MasterJamKerja masterJamKerja) {
+    if (checkOut == null) return '';
     Duration? selisihDatangPulang = this.selisihDatangPulang(masterJamKerja);
     if (jenis == 'wfh' || jenis == 'wfo') {
       return (selisihDatangPulang == null)
@@ -100,6 +105,7 @@ class Presensi {
   }
 
   String durasiLembur(MasterJamKerja masterJamKerja) {
+    if (isLembur == false || checkOut == null) return '';
     if (jenis == 'wfh' || jenis == 'wfo') {
       // jika lembur di hari kerja
       if (masterJamKerja != null &&

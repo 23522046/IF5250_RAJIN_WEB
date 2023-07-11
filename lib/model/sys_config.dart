@@ -1,66 +1,43 @@
 import 'package:if5250_rajin_apps_web/utils/util.dart';
 
+import 'jam_kerja.dart';
 import 'presensi.dart';
 
-MasterJamKerja getMasterJamkerja(DateTime dateTime, Presensi? presensi) {
-  return SysConfig.listJamKerja(presensi?.timeCreate.toDate()).firstWhere(
+MasterJamKerja getMasterJamkerja(
+    DateTime dateTime, Presensi? presensi, List<JamKerja> jamKerjas) {
+  List<MasterJamKerja> listJamKerja = jamKerjas.map((j) {
+    var jamMasuk = j.masuk.split(':');
+    var jamPulang = j.pulang.split(':');
+    return MasterJamKerja(
+        weekday: j.weekday,
+        jamMasuk: DateTime(
+            dateTime.year,
+            dateTime.month,
+            dateTime.day,
+            int.parse(jamMasuk[0]),
+            int.parse(jamMasuk[1]),
+            int.parse(jamMasuk[2])),
+        jamPulang: DateTime(
+            dateTime.year,
+            dateTime.month,
+            dateTime.day,
+            int.parse(jamPulang[0]),
+            int.parse(jamPulang[1]),
+            int.parse(jamPulang[2])));
+  }).toList();
+
+  return listJamKerja.firstWhere(
       (jamKerja) =>
-          jamKerja.weekday == dateTime.weekday && dateTime.isWorkingDay()
-      // ,orElse: () => null
-      );
+          jamKerja.weekday == dateTime.weekday && dateTime.isWorkingDay(),
+      orElse: () => MasterJamKerja(
+          weekday: dateTime.weekday,
+          jamMasuk:
+              DateTime(dateTime.year, dateTime.month, dateTime.day, 07, 59, 00),
+          jamPulang: DateTime(
+              dateTime.year, dateTime.month, dateTime.day, 16, 00, 00)));
 }
 
 class SysConfig {
-  static int uangMakanNonPns = 20000;
-
-  static List<String> listUntrackedUser() {
-    return ['root', '130020002', 'presensia.root'];
-  }
-
-  static List<MasterJamKerja> listJamKerja(DateTime? dateTime) {
-    dateTime = dateTime ?? DateTime.now();
-
-    // jam kerja hari normal mulai 2 agustus 2022
-    List<MasterJamKerja> modeE = [
-      MasterJamKerja(
-          weekday: 1,
-          jamMasuk:
-              DateTime(dateTime.year, dateTime.month, dateTime.day, 7, 59, 00),
-          jamPulang:
-              DateTime(dateTime.year, dateTime.month, dateTime.day, 16, 00)),
-      MasterJamKerja(
-          weekday: 2,
-          jamMasuk:
-              DateTime(dateTime.year, dateTime.month, dateTime.day, 7, 59, 00),
-          jamPulang:
-              DateTime(dateTime.year, dateTime.month, dateTime.day, 16, 00)),
-      MasterJamKerja(
-          weekday: 3,
-          jamMasuk:
-              DateTime(dateTime.year, dateTime.month, dateTime.day, 7, 59, 00),
-          jamPulang:
-              DateTime(dateTime.year, dateTime.month, dateTime.day, 16, 00)),
-      MasterJamKerja(
-          weekday: 4,
-          jamMasuk:
-              DateTime(dateTime.year, dateTime.month, dateTime.day, 7, 59, 00),
-          jamPulang:
-              DateTime(dateTime.year, dateTime.month, dateTime.day, 16, 00)),
-      MasterJamKerja(
-          weekday: 5,
-          jamMasuk:
-              DateTime(dateTime.year, dateTime.month, dateTime.day, 7, 59, 00),
-          jamPulang:
-              DateTime(dateTime.year, dateTime.month, dateTime.day, 16, 30)),
-    ];
-
-    // setup jam kerja
-    List<MasterJamKerja> jamKerjas;
-    jamKerjas = modeE; // dari setelah 1 Agustus 2022
-
-    return jamKerjas;
-  }
-
   //setup tanggal merah
   static List<dynamic> listTanggalMerah() {
     final List<dynamic> list = [
