@@ -7,8 +7,9 @@ class Staff {
   static const collectionName = 'staff';
   String? UID, nama, noInduk, playerId;
   Timestamp? timeCreate;
-  bool? isAktif, isAdminWeb;
+  bool? isAktif, isSuperUser;
   DocumentReference? unitKerja;
+  DocumentReference? unitKerjaParentAdmin;
   DocumentReference? unitKerjaParent;
   UnitKerja? unitKerjaParentCol;
   String? unitKerjaParentName;
@@ -22,13 +23,14 @@ class Staff {
       this.unitKerja,
       this.timeCreate,
       this.isAktif,
-      this.isAdminWeb,
+      this.unitKerjaParentAdmin,
       this.jumlahHadir,
       this.playerId,
       this.UID,
       this.unitKerjaParent,
       this.unitKerjaParentName,
-      this.unitKerjaParentCol});
+      this.unitKerjaParentCol,
+      this.isSuperUser});
 
   factory Staff.fromJson(Map<String, dynamic> json) {
     return Staff(
@@ -37,8 +39,21 @@ class Staff {
         unitKerja: json['unit_kerja'],
         timeCreate: json['time_create'],
         isAktif: json['is_aktif'],
-        isAdminWeb: json['isAdminWeb'],
+        unitKerjaParentAdmin: json['unit_kerja_parent_admin'],
         playerId: json['player_id'],
         UID: json['UID']);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'UID': UID,
+      'is_aktif': true,
+      'nama': nama,
+      'no_induk': noInduk,
+      'player_id': playerId,
+      'time_create': timeCreate,
+      'unit_kerja': unitKerja,
+      'unit_kerja_parent_admin': unitKerjaParentAdmin
+    };
   }
 }

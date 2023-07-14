@@ -33,6 +33,14 @@ class _BatasWilayahTabState extends State<BatasWilayahTab> {
   }
 
   @override
+  void initState() {
+    loadSession().then(
+      (staffSession) => actionReloadData(staffSession.unitKerjaParent!.id),
+    );
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: loadSession(),

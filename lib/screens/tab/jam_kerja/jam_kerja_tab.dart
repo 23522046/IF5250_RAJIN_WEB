@@ -33,6 +33,14 @@ class _JamKerjaTabState extends State<JamKerjaTab> {
   }
 
   @override
+  void initState() {
+    loadSession().then((staffSession) {
+      actionReloadData(staffSession.unitKerjaParent!.id);
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: loadSession(),
@@ -122,8 +130,9 @@ class _JamKerjaTabState extends State<JamKerjaTab> {
                       Expanded(
                           child: MaterialButton(
                         onPressed: () async {
-                          if (_formKey.currentState!.validate())
+                          if (_formKey.currentState!.validate()) {
                             actionReloadData(staffSession.unitKerjaParent!.id);
+                          }
                         },
                         color: Colors.pinkAccent,
                         child: const Text(

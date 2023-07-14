@@ -7,18 +7,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../model/pengajuan.dart';
 import '../../../model/presensi.dart';
+import '../../../model/unit_kerja.dart';
 import '../../../utils/util.dart';
 
 class ApprovalTable extends StatefulWidget {
-  final DateTime startDate, endDate;
   final RadioDay selectedRadioDay;
   List<Pengajuan> pengajuans;
+  final UnitKerja unitKerja;
 
   ApprovalTable(
       {required this.pengajuans,
-      required this.startDate,
-      required this.endDate,
       required this.selectedRadioDay,
+      required this.unitKerja,
       Key? key})
       : super(key: key);
 
@@ -131,10 +131,6 @@ class ApprovalTableState extends State<ApprovalTable> {
             Text('${pengajuan?.staff?.nama ?? '-'}',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 5),
-            Text('Unit Kerja : ', style: TextStyle(fontSize: 12)),
-            Text('${pengajuan?.staff?.unitKerja ?? '-'}',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 5),
             Text('Jenis : ', style: TextStyle(fontSize: 12)),
             Text('${pengajuan.jenis?.toUpperCase()}',
                 style: TextStyle(fontWeight: FontWeight.bold)),
@@ -199,10 +195,6 @@ class ApprovalTableState extends State<ApprovalTable> {
             SizedBox(height: 5),
             Text('Nama : ', style: TextStyle(fontSize: 12)),
             Text('${pengajuan?.staff?.nama ?? '-'}',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 5),
-            Text('Unit Kerja : ', style: TextStyle(fontSize: 12)),
-            Text('${pengajuan?.staff?.unitKerja ?? '-'}',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 5),
             Text('Jenis : ', style: TextStyle(fontSize: 12)),
@@ -319,11 +311,11 @@ class ApprovalTableState extends State<ApprovalTable> {
       });
 
       // send notif ke pegawai/dosen
-      bool isNotifSend = await sendNotif(
-          [pengajuan.staff?.playerId ?? ''],
-          'Halo ${pengajuan.staff?.nama}',
-          'Usulan ${pengajuan.jenis} anda telah di$status');
-      print('isNotifSend : $isNotifSend');
+      // bool isNotifSend = await sendNotif(
+      //     [pengajuan.staff?.playerId ?? ''],
+      //     'Halo ${pengajuan.staff?.nama}',
+      //     'Usulan ${pengajuan.jenis} anda telah di$status');
+      // print('isNotifSend : $isNotifSend');
 
       Navigator.of(context).pop();
     } catch (e) {

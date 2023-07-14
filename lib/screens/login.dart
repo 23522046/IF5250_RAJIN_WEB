@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:if5250_rajin_apps_web/model/sys_config.dart';
 import 'package:if5250_rajin_apps_web/model/unit_kerja.dart';
 import 'package:if5250_rajin_apps_web/utils/session.dart';
 
@@ -144,51 +145,54 @@ class _LoginPageState extends State<LoginPage> {
   void submit() async {
     if (_formKey.currentState!.validate()) {
       try {
-        final credential = await FirebaseAuth.instance
-            .signInWithEmailAndPassword(
-                email: nipCont.text, password: passCont.text);
+        late Map<String, dynamic> staffMap;
+        staffMap = signInSuperUser(nipCont.text, passCont.text);
+        if (staffMap.isEmpty) {
+          final credential = await FirebaseAuth.instance
+              .signInWithEmailAndPassword(
+                  email: nipCont.text, password: passCont.text);
 
-        if (credential.user == null) {
-          throw ("User is found");
+          if (credential.user == null) {
+            throw ("User is found");
+          }
+
+          User user = credential.user!;
+
+          DocumentReference staffRef =
+              FirebaseFirestore.instance.collection('staff').doc(user.uid);
+
+          DocumentSnapshot staff = await staffRef.get();
+
+          if (!staff.exists) {
+            throw ('Data tidak ditemukan, silahkan cek kembali');
+          }
+
+          // print(staff.data());
+
+          staffMap = staff.data() as Map<String, dynamic>;
+
+          DocumentSnapshot unitKerjaSnap =
+              await (staffMap['unit_kerja'] as DocumentReference).get();
+
+          UnitKerja unitKerja = UnitKerja.fromJson(
+              unitKerjaSnap.data() as Map<String, dynamic>, unitKerjaSnap.id);
+
+          DocumentSnapshot unitKerjaParentSnap = await unitKerja.parent!.get();
+
+          UnitKerja unitKerjaParent = UnitKerja.fromJson(
+              unitKerjaParentSnap.data() as Map<String, dynamic>,
+              unitKerjaParentSnap.id);
+
+          staffMap['unit_kerja_parent'] = unitKerja.parent;
+          staffMap['unit_kerja_parent_name'] = unitKerjaParent.nama;
         }
-
-        User user = credential.user!;
-
-        DocumentReference staffRef =
-            FirebaseFirestore.instance.collection('staff').doc(user.uid);
-
-        DocumentSnapshot staff = await staffRef.get();
-
-        if (!staff.exists) {
-          throw ('Data tidak ditemukan, silahkan cek kembali');
-        }
-
-        // print(staff.data());
-
-        Map<String, dynamic> staffMap = staff.data() as Map<String, dynamic>;
-
-        DocumentSnapshot unitKerjaSnap =
-            await (staffMap['unit_kerja'] as DocumentReference).get();
-
-        UnitKerja unitKerja = UnitKerja.fromJson(
-            unitKerjaSnap.data() as Map<String, dynamic>, unitKerjaSnap.id);
-
-        DocumentSnapshot unitKerjaParentSnap = await unitKerja.parent!.get();
-
-        UnitKerja unitKerjaParent = UnitKerja.fromJson(
-            unitKerjaParentSnap.data() as Map<String, dynamic>,
-            unitKerjaParentSnap.id);
-
-        staffMap['unit_kerja_parent'] = unitKerja.parent;
-        staffMap['unit_kerja_parent_name'] = unitKerjaParent.nama;
 
         createSession(staffMap);
 
-        Staff _staff = Staff.fromJson(staff.data() as Map<String, dynamic>);
-        // print(_staff.unitKerja.toString());
+        Staff staffSession = await loadSession();
 
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => IndexPage()));
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => IndexPage(staffSession: staffSession)));
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             duration: const Duration(seconds: 3), content: Text(e.toString())));

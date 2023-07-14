@@ -1,7 +1,23 @@
+import 'package:if5250_rajin_apps_web/model/staff.dart';
 import 'package:if5250_rajin_apps_web/utils/util.dart';
 
 import 'jam_kerja.dart';
 import 'presensi.dart';
+
+Map<String, dynamic> signInSuperUser(String email, String password) {
+  if (email == 'root' && password == 'root') {
+    Map<String, dynamic> superUser = {
+      'UID': null,
+      'is_aktif': true,
+      'is_super_user': true,
+      'nama': 'Super User',
+      'no_induk': '01',
+      'unit_kerja_parent_name': 'RAJIN APPS SU'
+    };
+    return superUser;
+  }
+  return {};
+}
 
 MasterJamKerja getMasterJamkerja(
     DateTime dateTime, Presensi? presensi, List<JamKerja> jamKerjas) {

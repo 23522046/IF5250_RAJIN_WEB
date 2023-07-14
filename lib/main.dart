@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
                         Container(child: Text('Error.. : ${snapshot.error}'))));
           } else if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              return IndexPage();
+              return IndexPage(staffSession: snapshot.data!);
             }
             return LoginPage();
           }

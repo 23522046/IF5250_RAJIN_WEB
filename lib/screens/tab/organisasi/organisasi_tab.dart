@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:if5250_rajin_apps_web/screens/tab/organisasi/organisasi_form.dart';
 import 'package:if5250_rajin_apps_web/screens/tab/staff/staff_form.dart';
 import 'package:if5250_rajin_apps_web/screens/tab/staff/staff_table.dart';
 import 'package:if5250_rajin_apps_web/screens/tab/unit_kerja/unit_kerja_form.dart';
@@ -10,16 +11,16 @@ import 'package:if5250_rajin_apps_web/widgets/featured_heading.dart';
 import '../../../model/staff.dart';
 import '../../../model/unit_kerja.dart';
 import '../../../utils/session.dart';
-import 'unit_kerja_table.dart';
+import 'organisasi_table.dart';
 
-class UnitKerjaTab extends StatefulWidget {
-  UnitKerjaTab({super.key, required GlobalKey<ScaffoldState> scaffoldKey});
+class OrganisasiTab extends StatefulWidget {
+  OrganisasiTab({super.key, required GlobalKey<ScaffoldState> scaffoldKey});
 
   @override
-  State<UnitKerjaTab> createState() => _UnitKerjaTabState();
+  State<OrganisasiTab> createState() => _OrganisasiTabState();
 }
 
-class _UnitKerjaTabState extends State<UnitKerjaTab> {
+class _OrganisasiTabState extends State<OrganisasiTab> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController noIndukCont = TextEditingController();
   List<UnitKerja> listUnitKerja = <UnitKerja>[];
@@ -33,8 +34,7 @@ class _UnitKerjaTabState extends State<UnitKerjaTab> {
 
   @override
   void initState() {
-    loadSession().then(
-        (staffSession) => actionReloadData(staffSession.unitKerjaParent!.id));
+    loadSession().then((staffSession) => actionReloadData());
     super.initState();
   }
 
@@ -66,17 +66,17 @@ class _UnitKerjaTabState extends State<UnitKerjaTab> {
                 context: context,
                 barrierDismissible: false,
                 builder: (context) {
-                  return UnitKerjaForm(
+                  return OrganisasiForm(
                       unitKerja: null, staffSession: staffSession);
                 });
 
-            actionReloadData(staffSession.unitKerjaParent!.id);
+            actionReloadData();
           }),
       body: ListView(
         shrinkWrap: true,
         children: [
           FeaturedHeading(
-            title: 'Daftar Unit Kerja',
+            title: 'Daftar Instansi/Perusahaan',
             screenSize: screenSize,
             subtitle: '',
           ),
@@ -88,9 +88,8 @@ class _UnitKerjaTabState extends State<UnitKerjaTab> {
               )),
           renderSearchFilter(screenSize, staffSession),
           if (listUnitKerja.isNotEmpty)
-            UnitKerjaTable(
-              reloadData: () =>
-                  actionReloadData(staffSession.unitKerjaParent!.id),
+            OrganisasiTable(
+              reloadData: () => actionReloadData(),
               unitKerjas: listUnitKerja,
               staffSession: staffSession,
             )
@@ -143,7 +142,7 @@ class _UnitKerjaTabState extends State<UnitKerjaTab> {
                           child: MaterialButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            actionReloadData(staffSession.unitKerjaParent!.id);
+                            actionReloadData();
                           }
                         },
                         color: Colors.pinkAccent,
@@ -169,20 +168,31 @@ class _UnitKerjaTabState extends State<UnitKerjaTab> {
     );
   }
 
-  void actionReloadData(String unitKerjaParentId) async {
+  void actionReloadData() async {
     QuerySnapshot s = await FirebaseFirestore.instance
         .collection(UnitKerja.collectionName)
-        .where('parent',
-            isEqualTo: FirebaseFirestore.instance
-                .collection(UnitKerja.collectionName)
-                .doc(unitKerjaParentId))
+        .where('is_top_parent', isEqualTo: true)
         .get();
 
-    setState(() {
-      listUnitKerja = s.docs
-          .map(
-              (e) => UnitKerja.fromJson(e.data() as Map<String, dynamic>, e.id))
+    listUnitKerja = s.docs
+        .map((e) => UnitKerja.fromJson(e.data() as Map<String, dynamic>, e.id))
+        .toList();
+
+    listUnitKerja.asMap().forEach((index, u) async {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection(Staff.collectionName)
+          .where('unit_kerja_parent_admin',
+              isEqualTo: FirebaseFirestore.instance
+                  .collection(UnitKerja.collectionName)
+                  .doc(u.idDoc))
+          .get();
+
+      List<Staff> staffs = snapshot.docs
+          .map((d) => Staff.fromJson(d.data() as Map<String, dynamic>))
           .toList();
+
+      listUnitKerja[index].adminStaffs = staffs;
+      setState(() {});
     });
   }
 }
