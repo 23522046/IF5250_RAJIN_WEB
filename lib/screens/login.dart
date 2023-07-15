@@ -170,6 +170,9 @@ class _LoginPageState extends State<LoginPage> {
           // print(staff.data());
 
           staffMap = staff.data() as Map<String, dynamic>;
+          if (staffMap['unit_kerja_parent_admin'] == null) {
+            throw ('Akun anda tidak memiliki akses administrator');
+          }
 
           DocumentSnapshot unitKerjaSnap =
               await (staffMap['unit_kerja'] as DocumentReference).get();
@@ -194,6 +197,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => IndexPage(staffSession: staffSession)));
       } catch (e) {
+        print(e);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             duration: const Duration(seconds: 3), content: Text(e.toString())));
       }

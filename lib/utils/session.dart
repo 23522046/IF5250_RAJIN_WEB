@@ -29,7 +29,9 @@ Future<bool> createSession(Map<String, dynamic> staff) async {
     prefs.setString(UNIT_KERJA_PARENT_ID,
         (staff['unit_kerja_parent'] as DocumentReference).id);
   }
-  prefs.setString(UNIT_KERJA_PARENT_NAME, staff['unit_kerja_parent_name']);
+  if (staff['unit_kerja_parent_name'] != null) {
+    prefs.setString(UNIT_KERJA_PARENT_NAME, staff['unit_kerja_parent_name']);
+  }
   prefs.setBool(IS_SUPER_USER, staff['is_super_user'] ?? false);
 
   List<JamKerja> jamKerja = (staff['jam_kerja'] == null)
